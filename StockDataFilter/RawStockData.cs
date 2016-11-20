@@ -35,6 +35,11 @@ namespace StockDataFilter
             return nameToIndex[_name];
         }
 
+        public string FieldByName(string[] _entry, string _name)
+        {
+            return _entry[nameToIndex[_name]];
+        }
+
         public override string ToString()
         {
             return Filename;

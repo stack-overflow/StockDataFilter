@@ -50,19 +50,29 @@ namespace StockDataFilter
             return null;
         }
 
-        private void FillOriginalDataGrid(RawStockData data)
+        private void FillDataGrid(DataGrid grid, RawStockData data)
         {
-            originalDataGrid.Columns.Clear();
-            originalDataGrid.ItemsSource = null;
+            grid.Columns.Clear();
+            grid.ItemsSource = null;
 
             for (int i = 0; i < data.Fields.Length; ++i)
             {
                 var col = new DataGridTextColumn();
                 col.Header = data.Fields[i];
                 col.Binding = new Binding(string.Format("[{0}]", i));
-                originalDataGrid.Columns.Add(col);
+                grid.Columns.Add(col);
             }
-            originalDataGrid.ItemsSource = data.Entries;
+            grid.ItemsSource = data.Entries;
+        }
+
+        private void FillOriginalDataGrid(RawStockData data)
+        {
+            FillDataGrid(originalDataGrid, data);
+        }
+
+        private void FillResultDataGrid(RawStockData data)
+        {
+            FillDataGrid(resultDataGrid, data);
         }
 
         private void FillOriginalListBoxItemsSource(IEnumerable<RawStockData> _data)
@@ -130,21 +140,94 @@ namespace StockDataFilter
         {
             resultDataGrid.Columns.Clear();
             resultDataGrid.ItemsSource = null;
+
+            string leadingColumnName = ((firstFieldComboBox.SelectedItem) as ResultField).Name;
+            IEnumerable<ResultField> acceptedFields = resultFields.Where(rf => rf.Accepted == true);
+            IEnumerable<ResultField> acceptedFieldsNoLeadingCol = resultFields.Where(rf => rf.Accepted == true).Where(f => f.Name != leadingColumnName);
+            List<string[]> filesLeadingColumns = new List<string[]>();
+            foreach (var file in files)
+            {
+                var col = from entry in file.Entries
+                          select file.FieldByName(entry, leadingColumnName);
+                          //select entry[file.NameToIndex(leadingColumn)];
+
+                filesLeadingColumns.Add(col.ToArray());
+            }
+
+            string[] commonLeadingColumn = filesLeadingColumns.First();
+            foreach (string[] col in filesLeadingColumns.Skip(1))
+            {
+                commonLeadingColumn = Utils.LongestCommonSubsequence(commonLeadingColumn, col);
+            }
+
+            
+            RawStockData[] filesArray = files.ToArray();
+            string[,] result = new string[commonLeadingColumn.Length, acceptedFieldsNoLeadingCol.ToArray().Length * filesArray.Length + 1];
+            int[] fileIterators = new int[filesArray.Length];
+            for (int i = 0; i < commonLeadingColumn.Length; ++i)
+            {
+                result[i, 0] = commonLeadingColumn[i];
+            }
+            for (int i = 0; i < commonLeadingColumn.Length; ++i)
+            {
+                int fill_id = 1;
+                for (int j = 0; j < filesArray.Length; ++j)
+                {
+                    while (fileIterators[j] < filesArray[j].Entries.ToArray().Length &&
+                        !filesArray[j].FieldByName(filesArray[j].Entries[fileIterators[j]], leadingColumnName).Equals(result[i, 0]))
+                    {
+                        ++fileIterators[j];
+                    }
+                    foreach (ResultField acceptedField in acceptedFieldsNoLeadingCol.Where(f => f.Name != leadingColumnName))
+                    {
+                        result[i, fill_id] = filesArray[j].FieldByName(filesArray[j].Entries[fileIterators[j]], acceptedField.Name);
+                        ++fill_id;
+                    }
+                }
+            }
+
+            List<string> finalFields = new List<string>();
+            finalFields.Add(leadingColumnName);
+
+            foreach (ResultField field in acceptedFieldsNoLeadingCol)
+            {
+                foreach (var file in files)
+                {
+                    finalFields.Add(System.IO.Path.GetFileName(file.Filename) + "_" + field.Name);
+                }
+            }
+            List<string[]> finalEntries = new List<string[]>();
+            for (int i = 0; i < result.GetLength(0); ++i)
+            {
+                finalEntries.Add(new string[result.GetLength(1)]);
+                for (int j = 0; j < result.GetLength(1); ++j)
+                {
+                    finalEntries.Last()[j] = result[i, j];
+                }
+            }
+            resultFile = new RawStockData("result.csv", finalFields.ToArray(), finalEntries);
+            FillResultDataGrid(resultFile);
+        }
+
+        private void generateResultButton_Click1(object sender, RoutedEventArgs e)
+        {
+            resultDataGrid.Columns.Clear();
+            resultDataGrid.ItemsSource = null;
             List<string> fields = new List<string>();
 
-            //foreach (ResultField field in resultFields)
-            //{
-            //    if(field.Accepted)
-            //    {
-            //        foreach (var file in files)
-            //        {
-            //            fields.Add(field.Name);
-            //            var col = new DataGridTextColumn();
-            //            col.Header = file.Filename + "_" + field.Name;
-            //            resultDataGrid.Columns.Add(col);
-            //        }
-            //    }
-            //}
+            foreach (ResultField field in resultFields)
+            {
+                if (field.Accepted)
+                {
+                    foreach (var file in files)
+                    {
+                        fields.Add(field.Name);
+                        var col = new DataGridTextColumn();
+                        col.Header = file.Filename + "_" + field.Name;
+                        resultDataGrid.Columns.Add(col);
+                    }
+                }
+            }
 
             string firstColumn = ((firstFieldComboBox.SelectedItem) as ResultField).Name;
             List<string[]> allRows = new List<string[]>();
@@ -162,7 +245,11 @@ namespace StockDataFilter
             }
 
             List<string[]> result = new List<string[]>();
-            for (int i = 0; )
+            foreach (string c in common)
+            {
+                result.Add(new string[fields.ToArray().Length]);
+                result.Last()[0] = c;
+            }
         }
     }
 }

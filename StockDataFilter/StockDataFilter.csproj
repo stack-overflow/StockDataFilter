@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CustomCommands.cs" />
     <Compile Include="RawStockData.cs" />
     <Compile Include="ResultField.cs" />
     <Compile Include="Settings.cs" />
