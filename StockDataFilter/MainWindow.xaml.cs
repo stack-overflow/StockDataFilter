@@ -26,6 +26,7 @@ namespace StockDataFilter
         FileRepository fileRepo = new FileRepository();
         private ObservableCollection<RawStockData> files = new ObservableCollection<RawStockData>();
         private ObservableCollection<ResultField> resultFields = new ObservableCollection<ResultField>();
+        private RawStockData resultFile = null;
 
         public MainWindow()
         {
@@ -68,7 +69,6 @@ namespace StockDataFilter
         {
             foreach (var d in _data)
             {
-                textBlock.Text += d.Filename + "\n";
                 files.Add(d);
             }
         }
@@ -124,6 +124,45 @@ namespace StockDataFilter
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
+        }
+
+        private void generateResultButton_Click(object sender, RoutedEventArgs e)
+        {
+            resultDataGrid.Columns.Clear();
+            resultDataGrid.ItemsSource = null;
+            List<string> fields = new List<string>();
+
+            //foreach (ResultField field in resultFields)
+            //{
+            //    if(field.Accepted)
+            //    {
+            //        foreach (var file in files)
+            //        {
+            //            fields.Add(field.Name);
+            //            var col = new DataGridTextColumn();
+            //            col.Header = file.Filename + "_" + field.Name;
+            //            resultDataGrid.Columns.Add(col);
+            //        }
+            //    }
+            //}
+
+            string firstColumn = ((firstFieldComboBox.SelectedItem) as ResultField).Name;
+            List<string[]> allRows = new List<string[]>();
+            foreach (var file in files)
+            {
+                var dates = from entry in file.Entries
+                            select entry[file.NameToIndex(firstColumn)];
+
+                allRows.Add(dates.ToArray());
+            }
+            string[] common = allRows.First();
+            foreach (string[] rows in allRows.Skip(1))
+            {
+                common = Utils.LongestCommonSubsequence(common, rows);
+            }
+
+            List<string[]> result = new List<string[]>();
+            for (int i = 0; )
         }
     }
 }

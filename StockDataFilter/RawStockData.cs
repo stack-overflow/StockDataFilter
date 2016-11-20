@@ -30,6 +30,11 @@ namespace StockDataFilter
                                 .ToDictionary(x => _fields[x], x => x);
         }
 
+        public int NameToIndex(string _name)
+        {
+            return nameToIndex[_name];
+        }
+
         public override string ToString()
         {
             return Filename;
