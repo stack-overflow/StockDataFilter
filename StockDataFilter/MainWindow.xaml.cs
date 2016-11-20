@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace StockDataFilter
 {
@@ -93,15 +94,19 @@ namespace StockDataFilter
             {
                 commonFields = Utils.LongestCommonSubsequence(commonFields, fields);
             }
-            // TODO: Examine the existing resultFields collection
+
             foreach (var field in commonFields)
             {
-                var resultField = new ResultField() { Name = field, Accepted = true };
-                resultFields.Add(resultField);
-
-                if(resultField.Name == settings.DefaultFirstField)
+                // Don't add the field if it is already present on the list
+                if (!resultFields.Where(f => f.Name.Equals(field)).Any())
                 {
-                    firstFieldComboBox.SelectedItem = resultField;
+                    var resultField = new ResultField() { Name = field, Accepted = true };
+                    resultFields.Add(resultField);
+
+                    if (resultField.Name == settings.DefaultFirstField)
+                    {
+                        firstFieldComboBox.SelectedItem = resultField;
+                    }
                 }
             }
         }
@@ -128,12 +133,24 @@ namespace StockDataFilter
 
         private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            e.CanExecute = resultFile != null;
         }
 
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.DefaultExt = ".csv";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filename = saveFileDialog.FileName;
+                using (StreamWriter outputFile = new StreamWriter(filename))
+                {
+                    foreach (string[] entry in resultFile.Entries)
+                    {
+                        outputFile.WriteLine(String.Join(";", entry));
+                    }
+                }
+            }
         }
 
         private void generateResultButton_Click(object sender, RoutedEventArgs e)
@@ -189,9 +206,9 @@ namespace StockDataFilter
             List<string> finalFields = new List<string>();
             finalFields.Add(leadingColumnName);
 
-            foreach (ResultField field in acceptedFieldsNoLeadingCol)
+            foreach (var file in files)
             {
-                foreach (var file in files)
+                foreach (ResultField field in acceptedFieldsNoLeadingCol)
                 {
                     finalFields.Add(System.IO.Path.GetFileName(file.Filename) + "_" + field.Name);
                 }
