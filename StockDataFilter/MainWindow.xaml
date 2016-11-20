@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StockDataFilter"
         mc:Ignorable="d"
-        Title="Stock Data Filter" MinHeight="600" MinWidth="800" Height="763.5" Width="1145">
+        Title="Akcjonator" MinHeight="600" MinWidth="800" Height="763.5" Width="1145">
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
         <!--<CommandBinding Command="local:CustomCommands.Generate" CanExecute="GenerateCommand_CanExecute" Executed="GenerateCommand_Executed" />-->
         <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
         <CommandBinding Command="Delete" CanExecute="DeleteCommand_CanExecute" Executed="DeleteCommand_Executed"/>
+        <CommandBinding Command="Help" CanExecute="HelpCommand_CanExecute" Executed="HelpCommand_Executed"/>
     </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -20,6 +21,7 @@
                 <Separator/>
                 <MenuItem Header="_Wyjdź"/>
             </MenuItem>
+            <MenuItem Command="Help" Header="_Info"/>
         </Menu>
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
@@ -38,7 +40,14 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Button Command="Open" Grid.Column="0" Content="Otwórz plik" Margin="10,10,10,10"/>
+                        <DockPanel LastChildFill="True" Grid.Column="0" >
+                            <Label Content="Separator" Margin="10,10,0,10"/>
+                            <ComboBox Name="inputSeparatorComboBox" SelectedIndex="0" Grid.Column="0" Margin="10,10,10,10">
+                                <ComboBoxItem Content=";"/>
+                                <ComboBoxItem Content=","/>
+                            </ComboBox>
+                            <Button Command="Open" Content="Otwórz plik" Margin="0,10,10,10"/>
+                        </DockPanel>
                         <Button Command="Delete" Grid.Column="1" Content="Usuń plik" Margin="10,10,10,10"/>
                         <!--<Button Grid.Column="1" Content="Usuń plik"></Button>-->
                     </Grid>
@@ -100,12 +109,15 @@
                     </DataGrid>
                 </DockPanel>
             </Grid>
-            <DataGrid Name="originalDataGrid"
-                      AutoGenerateColumns="False"
-                      Margin="10,10,10,10"
-                      Grid.Row="0" Grid.Column="1">
+            <DockPanel Grid.Row="0" Grid.Column="1">
+                <Label Content="Orignalny plik" DockPanel.Dock="Top"
+                       Margin="10,0,10,0"/>
+                <DataGrid Name="originalDataGrid"
+                          AutoGenerateColumns="False"
+                          Margin="10,0,10,10">
 
-            </DataGrid>
+                </DataGrid>
+            </DockPanel>
         </Grid>
     </DockPanel>
 </Window>

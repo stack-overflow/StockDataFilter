@@ -146,7 +146,9 @@ namespace StockDataFilter
             string[] filenames = CollectFilenames();
             if(filenames != null)
             {
-                var data = fileRepo.ReadDataFromFiles(filenames);
+                var sep = (inputSeparatorComboBox.SelectedValue as ComboBoxItem).Content as string;
+                sep = sep == null ? ";" : sep;
+                var data = fileRepo.ReadDataFromFiles(filenames, sep);
 
                 FillOriginalListBoxItemsSource(data);
                 filesListBox.SelectedIndex = 0;
@@ -168,6 +170,7 @@ namespace StockDataFilter
                 string filename = saveFileDialog.FileName;
                 using (StreamWriter outputFile = new StreamWriter(filename))
                 {
+                    outputFile.WriteLine(String.Join(";", resultFile.Fields));
                     foreach (string[] entry in resultFile.Entries)
                     {
                         outputFile.WriteLine(String.Join(";", entry));
@@ -301,6 +304,16 @@ namespace StockDataFilter
         {
             files.Remove(filesListBox.SelectedItem as RawStockData);
             UpdateResultFieldsList();
+        }
+
+        private void HelpCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void HelpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("Licencja użytkowania dla Wioletty Kilijańskiej :)" + Environment.NewLine + Environment.NewLine + "© Tomasz Truszkowski" + Environment.NewLine + "Wszystkie prawa zastrzeżone.", "Info");
         }
     }
 }

@@ -58,10 +58,10 @@ namespace StockDataFilter
             return new RawStockData(_filename, header, entries);
         }
 
-        public IEnumerable<RawStockData> ReadDataFromFiles(string[] _filenames)
+        public IEnumerable<RawStockData> ReadDataFromFiles(string[] _filenames, string _separator)
         {
             return from fn in _filenames
-                   select ReadDataFromFile(fn, ";"); ;
+                   select ReadDataFromFile(fn, _separator); ;
         }
     }
 }
