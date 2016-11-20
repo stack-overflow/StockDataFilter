@@ -51,19 +51,27 @@ namespace StockDataFilter
             return null;
         }
 
-        private void FillDataGrid(DataGrid grid, RawStockData data)
+        private void ClearDataGrid(DataGrid grid)
         {
             grid.Columns.Clear();
             grid.ItemsSource = null;
+        }
 
-            for (int i = 0; i < data.Fields.Length; ++i)
+        private void FillDataGrid(DataGrid grid, RawStockData data)
+        {
+            ClearDataGrid(grid);
+
+            if (data != null)
             {
-                var col = new DataGridTextColumn();
-                col.Header = data.Fields[i];
-                col.Binding = new Binding(string.Format("[{0}]", i));
-                grid.Columns.Add(col);
+                for (int i = 0; i < data.Fields.Length; ++i)
+                {
+                    var col = new DataGridTextColumn();
+                    col.Header = data.Fields[i];
+                    col.Binding = new Binding(string.Format("[{0}]", i));
+                    grid.Columns.Add(col);
+                }
+                grid.ItemsSource = data.Entries;
             }
-            grid.ItemsSource = data.Entries;
         }
 
         private void FillOriginalDataGrid(RawStockData data)
@@ -89,10 +97,22 @@ namespace StockDataFilter
             var filesFields = from f in files
                                select f.Fields;
             
+            if (!filesFields.Any())
+            {
+                resultFields.Clear();
+                return;
+            }
+
             var commonFields = filesFields.First().ToArray();
             foreach (var fields in filesFields.Skip(1))
             {
                 commonFields = Utils.LongestCommonSubsequence(commonFields, fields);
+            }
+
+            var result = resultFields.Where(f => !commonFields.Any(f2 => f2 == f.Name));
+            foreach (var r in result)
+            {
+                resultFields.Remove(r);
             }
 
             foreach (var field in commonFields)
@@ -100,7 +120,7 @@ namespace StockDataFilter
                 // Don't add the field if it is already present on the list
                 if (!resultFields.Where(f => f.Name.Equals(field)).Any())
                 {
-                    var resultField = new ResultField() { Name = field, Accepted = true };
+                    var resultField = new ResultField() { Name = field, Accepted = settings.DefaultAcceptedColumns.Contains(field) };
                     resultFields.Add(resultField);
 
                     if (resultField.Name == settings.DefaultFirstField)
@@ -124,11 +144,14 @@ namespace StockDataFilter
         private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             string[] filenames = CollectFilenames();
-            var data = fileRepo.ReadDataFromFiles(filenames);
+            if(filenames != null)
+            {
+                var data = fileRepo.ReadDataFromFiles(filenames);
 
-            FillOriginalListBoxItemsSource(data);
-            FillOriginalDataGrid(data.First());
-            UpdateResultFieldsList();
+                FillOriginalListBoxItemsSource(data);
+                filesListBox.SelectedIndex = 0;
+                UpdateResultFieldsList();
+            }
         }
 
         private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -267,6 +290,17 @@ namespace StockDataFilter
                 result.Add(new string[fields.ToArray().Length]);
                 result.Last()[0] = c;
             }
+        }
+
+        private void DeleteCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (filesListBox != null) && (filesListBox.SelectedItem != null);
+        }
+
+        private void DeleteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            files.Remove(filesListBox.SelectedItem as RawStockData);
+            UpdateResultFieldsList();
         }
     }
 }

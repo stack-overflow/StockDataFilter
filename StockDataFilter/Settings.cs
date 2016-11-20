@@ -20,5 +20,18 @@ namespace StockDataFilter
                 defaultFirstField = value;
             }
         }
+
+        private HashSet<string> defaultAcceptedColumns = new HashSet<string>() { "Data", "Zamkniecie" };
+        public HashSet<string> DefaultAcceptedColumns
+        {
+            get
+            {
+                return defaultAcceptedColumns;
+            }
+            set
+            {
+                defaultAcceptedColumns = value;
+            }
+        }
     }
 }

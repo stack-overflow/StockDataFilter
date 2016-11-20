@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 // 1. Tabs with separate files DONE
 // 2. Option to replace something in a particular column
 // 3. Selecting columns to be exported into one DONE
-// 4. Longest common sequence of selected column
+// 4. Longest common sequence of selected column DONE
+// 5. Remove file DONE
+// 6. Labels DONE
+// 7. Default options DONE
 //
 
 namespace StockDataFilter
