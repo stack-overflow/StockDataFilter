@@ -8,32 +8,6 @@ namespace StockDataFilter
 {
     static class Utils
     {
-//def longest_common_sequence(A, B):
-//    w, h = len(A), len(B)
-//    C = [[0 for x in range(w + 1)] for y in range(h + 1)]
-
-//    for i in range(1, w + 1):
-//        for j in range(1, h + 1):
-//            if A[i - 1] == B[j - 1]:
-//                C[i][j] = C[i - 1][j - 1] + 1
-//            elif C[i - 1][j] > C[i][j - 1]:
-//                C[i][j] = C[i - 1][j]
-//            else:
-//                C[i][j] = C[i][j - 1]
-
-//    seq = []
-//    i, j = 0, 0
-//    while i<w and j<h:
-//        if A[i] == B[j]:
-//            seq.append(A[i])
-//            print(A[i])
-//            i += 1
-//            j += 1
-//        elif C[i + 1][j] > C[i][j + 1]:
-//            i += 1
-//        else:
-//            j += 1
-//    return seq
         public static string[] LongestCommonSubsequence(string[] A, string[] B)
         {
             List<string> seq = new List<string>();
