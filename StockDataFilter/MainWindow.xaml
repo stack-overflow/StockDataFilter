@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StockDataFilter"
         mc:Ignorable="d"
-        Title="Stock Data Filter" Height="350" Width="525">
+        Title="Stock Data Filter" Height="600" Width="800">
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
+        <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
     </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -19,9 +20,65 @@
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Bottom">
-            <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="281" Width="220"><Run Text="Log:"/><LineBreak/><Run/></TextBlock>
-            <DataGrid Name="originalDataGrid" AutoGenerateColumns="False"
-                Margin="235,10,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <ListBox Name="filesListBox"
+                         SelectionChanged="filesListBox_SelectionChanged"
+                         Margin="10,10,10,10"
+                         Grid.Row="0" Grid.Column="0">
+
+                </ListBox>
+                <Grid Grid.Row="1" Grid.Column="0" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Name="resultFieldsListBox"
+                         Margin="10,10,10,10"
+                         Grid.Row="1" Grid.Column="0"
+                         HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" Grid.Column="0"/>
+                                    <CheckBox IsChecked="{Binding Accepted}" Grid.Column="1"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1" Margin="10,10,10,10">
+                        <DockPanel LastChildFill="True">
+                            <Label Content="Pierwsza kolumna" />
+                            <ComboBox Name="firstFieldComboBox" Grid.Row="0" Grid.Column="1">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </DockPanel>
+                    </StackPanel>
+                </Grid>
+                <TextBlock x:Name="textBlock"
+                       Margin="10,10,10,10" TextWrapping="Wrap"
+                       Grid.Row="2" Grid.Column="0"><Run Text="Log:"/><LineBreak/><Run/></TextBlock>
+            </Grid>
+            <DataGrid Name="originalDataGrid"
+                      AutoGenerateColumns="False"
+                      Margin="10,10,10,10"
+                      Grid.Row="0" Grid.Column="1">
 
             </DataGrid>
         </Grid>

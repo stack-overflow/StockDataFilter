@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 // Next steps:
-// 1. Tabs with separate files
+// 1. Tabs with separate files DONE
 // 2. Option to replace something in a particular column
-// 3. Selecting columns to be exported into one
+// 3. Selecting columns to be exported into one DONE
 // 4. Longest common sequence of selected column
 //
 
@@ -16,17 +16,6 @@ namespace StockDataFilter
 {
     class FileRepository
     {
-        List<string> filenames = new List<string>();
-
-        public void AddFilename(string _filename)
-        {
-            if(!File.Exists(_filename))
-            {
-                throw new FileNotFoundException("Nie znaleziono pliku", _filename);
-            }
-            filenames.Add(_filename);
-        }
-
         private string[] ResolveDuplicateFields(string[] _fields)
         {
             Dictionary<string, int> count_seen_fields = new Dictionary<string, int>();
@@ -49,6 +38,11 @@ namespace StockDataFilter
 
         private RawStockData ReadDataFromFile(string _filename, string _separator)
         {
+            if (!File.Exists(_filename))
+            {
+                throw new FileNotFoundException("Nie znaleziono pliku", _filename);
+            }
+
             var separators = new string[] { _separator };
             var lines = File.ReadAllLines(_filename);
             var header = lines.First().Split(separators, StringSplitOptions.None);
@@ -61,9 +55,9 @@ namespace StockDataFilter
             return new RawStockData(_filename, header, entries);
         }
 
-        public IEnumerable<RawStockData> GetData()
+        public IEnumerable<RawStockData> ReadDataFromFiles(string[] _filenames)
         {
-            return from fn in filenames
+            return from fn in _filenames
                    select ReadDataFromFile(fn, ";"); ;
         }
     }
