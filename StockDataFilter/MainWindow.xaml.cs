@@ -315,5 +315,15 @@ namespace StockDataFilter
         {
             MessageBox.Show("Licencja użytkowania dla Wioletty Kilijańskiej :)" + Environment.NewLine + Environment.NewLine + "© Tomasz Truszkowski" + Environment.NewLine + "Wszystkie prawa zastrzeżone.", "Info");
         }
+
+        private void CloseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            App.Current.Shutdown();
+        }
     }
 }

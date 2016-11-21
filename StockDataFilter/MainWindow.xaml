@@ -12,6 +12,7 @@
         <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
         <CommandBinding Command="Delete" CanExecute="DeleteCommand_CanExecute" Executed="DeleteCommand_Executed"/>
         <CommandBinding Command="Help" CanExecute="HelpCommand_CanExecute" Executed="HelpCommand_Executed"/>
+        <CommandBinding Command="Close" CanExecute="CloseCommand_CanExecute" Executed="CloseCommand_Executed"/>
     </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -19,7 +20,7 @@
                 <MenuItem Command="Open" Header="_Otwórz"/>
                 <MenuItem Command="Save" Header="_Zapisz" />
                 <Separator/>
-                <MenuItem Header="_Wyjdź"/>
+                <MenuItem Command="Close" Header="_Wyjdź"/>
             </MenuItem>
             <MenuItem Command="Help" Header="_Info"/>
         </Menu>
